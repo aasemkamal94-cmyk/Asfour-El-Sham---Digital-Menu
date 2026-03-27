@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عصفور الشام - Authentic Syrian Taste</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#EA580C',
+                            secondary: '#9A3412',
+                        },
+                        luxury: {
+                            cream: '#FDFCF8',
+                            gold: '#D4AF37',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .luxury-shadow {
+            box-shadow: 0 20px 50px rgba(234, 88, 12, 0.1);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #F9D976 50%, #D4AF37 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body {
+            background-color: #FDFCF8;
+            color: #1a1a1a;
+        }
+    </style>
+
+    <!-- React & Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+        const { motion, AnimatePresence } = window.Motion || window.framerMotion || {};
+
+        // Lucide Icons Helper - Robust implementation for React
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const [elements, setElements] = useState([]);
+            
+            useEffect(() => {
+                if (window.lucide && window.lucide.icons) {
+                    // Try exact match or lowercase match
+                    const iconData = window.lucide.icons[name] || window.lucide.icons[name.charAt(0).toLowerCase() + name.slice(1)];
+                    if (iconData) {
+                        setElements(iconData);
+                    }
+                }
+            }, [name]);
+
+            if (elements.length === 0) return <span style={{ width: size, height: size, display: 'inline-block' }} />;
+
+            return (
+                <svg
+                    width={size}
+                    height={size}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={className}
+                >
+                    {elements.map((element, index) => {
+                        const [tag, attrs] = element;
+                        return React.createElement(tag, { ...attrs, key: index });
+                    })}
+                </svg>
+            );
+        };
+
+        // Menu Data
+        const MENU_DATA = [
+            // Sandwiches
+            { id: 's1', name: 'بانية بلدي فريش', price: 60, priceSyrian: 50, category: 'سندوتشات' },
+            { id: 's2', name: 'بانية قطعة واحدة مع بطاطس', price: 30, priceSyrian: 25, category: 'سندوتشات' },
+            { id: 's3', name: 'بانية دبل مع بطاطس', price: 35, priceSyrian: 30, category: 'سندوتشات' },
+            { id: 's4', name: 'زنجر', price: 70, priceSyrian: 60, category: 'سندوتشات' },
+            { id: 's5', name: 'كريسبي', price: 70, priceSyrian: 60, category: 'سندوتشات' },
+            { id: 's6', name: 'بطاطس', price: 25, priceSyrian: 20, category: 'سندوتشات' },
+            { id: 's7', name: 'بطاطس مكس فلافل', price: 30, priceSyrian: 25, category: 'سندوتشات' },
+            { id: 's8', name: 'بطاطس اكسترا دبل', price: 35, category: 'سندوتشات' },
+            { id: 's9', name: 'فلافل', price: 25, priceSyrian: 20, category: 'سندوتشات' },
+            { id: 's10', name: 'فاهيتا', price: 60, priceSyrian: 50, category: 'سندوتشات' },
+            { id: 's11', name: 'شيش', price: 65, priceSyrian: 55, category: 'سندوتشات' },
+            { id: 's12', name: 'كبدة فراخ', price: 40, priceSyrian: 35, category: 'سندوتشات' },
+            { id: 's13', name: 'كبدة بقري', price: 40, priceSyrian: 35, category: 'سندوتشات' },
+            { id: 's14', name: 'هوت دوج', price: 40, priceSyrian: 35, category: 'سندوتشات' },
+            { id: 's15', name: 'سجق', price: 40, priceSyrian: 35, category: 'سندوتشات' },
+
+            // Crepes
+            { id: 'c1', name: 'كريب بانية', price: 70, category: 'كريب' },
+            { id: 'c2', name: 'كريب بانية بلدي', price: 80, category: 'كريب' },
+            { id: 'c3', name: 'كريب زنجر', price: 85, category: 'كريب' },
+            { id: 'c4', name: 'كريب فاهيتا', price: 85, category: 'كريب' },
+            { id: 'c5', name: 'كريب شيش', price: 85, category: 'كريب' },
+            { id: 'c6', name: 'كريب استربس', price: 85, category: 'كريب' },
+            { id: 'c7', name: 'كريب مكس فراخ', price: 100, category: 'كريب' },
+            { id: 'c8', name: 'كريب مكس جبن', price: 65, category: 'كريب' },
+            { id: 'c9', name: 'كريب كبدة', price: 75, category: 'كريب' },
+            { id: 'c10', name: 'كريب سجق', price: 75, category: 'كريب' },
+            { id: 'c11', name: 'كريب هوت دوج', price: 75, category: 'كريب' },
+            { id: 'c12', name: 'كريب بطاطس', price: 45, category: 'كريب' },
+
+            // Ghost Burger
+            { id: 'b1', name: 'برجر الشبح', price: 65, category: 'برجر الشبح' },
+            { id: 'b2', name: 'برجر الشبح بيض', price: 70, category: 'برجر الشبح' },
+            { id: 'b3', name: 'برجر الشبح جبنة', price: 75, category: 'برجر الشبح' },
+            { id: 'b4', name: 'برجر الشبح بيض وجبنة', price: 80, category: 'برجر الشبح' },
+
+            // Meals
+            { id: 'm1', name: 'وجبة كريسبي كبير', price: 95, category: 'وجبات' },
+            { id: 'm2', name: 'وجبة زنجر كبير', price: 95, category: 'وجبات' },
+            { id: 'm3', name: 'وجبة بانية بلدي كبير', price: 95, category: 'وجبات' },
+            { id: 'm4', name: 'وجبة شيش', price: 70, priceSyrian: 60, category: 'وجبات' },
+            { id: 'm5', name: 'وجبة هوت دوج', price: 60, priceSyrian: 50, category: 'وجبات' },
+            { id: 'm6', name: 'وجبة سجق', price: 60, priceSyrian: 50, category: 'وجبات' },
+            { id: 'm7', name: 'وجبة فاهيتا', price: 70, priceSyrian: 60, category: 'وجبات' },
+            { id: 'm8', name: 'وجبة كبدة فراخ', price: 60, priceSyrian: 50, category: 'وجبات' },
+            { id: 'm9', name: 'وجبة كبدة بقري', price: 60, priceSyrian: 50, category: 'وجبات' },
+
+            // Add-ons
+            { id: 'a1', name: 'طبق رز', price: 25, category: 'إضافات' },
+            { id: 'a2', name: 'عيش شامي', price: 3.5, category: 'إضافات' },
+            { id: 'a3', name: 'عيش سوري', price: 3.5, category: 'إضافات' },
+            { id: 'a4', name: 'شيدر في سندوتش', price: 15, category: 'إضافات' },
+            { id: 'a5', name: 'موتزاريللا في سندوتش', price: 15, category: 'إضافات' },
+            { id: 'a6', name: 'باكت بطاطس كبير', price: 25, category: 'إضافات' },
+            { id: 'a7', name: 'باكت بطاطس صغير', price: 20, category: 'إضافات' },
+
+            // Salads
+            { id: 'sl1', name: 'مخلل كبير', price: 15, category: 'سلطات ومقبلات' },
+            { id: 'sl2', name: 'مخلل صغير', price: 10, category: 'سلطات ومقبلات' },
+            { id: 'sl3', name: 'كول سلو كبير', price: 25, category: 'سلطات ومقبلات' },
+            { id: 'sl4', name: 'كول سلو صغير', price: 20, category: 'سلطات ومقبلات' },
+            { id: 'sl5', name: 'تومية كبير', price: 25, category: 'سلطات ومقبلات' },
+            { id: 'sl6', name: 'ثوميه صغير', price: 20, category: 'سلطات ومقبلات' },
+        ];
+
+        const CATEGORIES = ['سندوتشات', 'كريب', 'برجر الشبح', 'وجبات', 'إضافات', 'سلطات ومقبلات'];
+        const WHATSAPP_NUMBER = '201122292214';
+        const FACEBOOK_URL = 'https://www.facebook.com/share/188pb49QWy/';
+
+        function App() {
+            const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
+            const [cart, setCart] = useState([]);
+            const [isCartOpen, setIsCartOpen] = useState(false);
+            const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+            const [checkoutStep, setCheckoutStep] = useState(1);
+            const [showToast, setShowToast] = useState(false);
+            const [pastOrders, setPastOrders] = useState(() => {
+                const saved = localStorage.getItem('asfour_past_orders');
+                return saved ? JSON.parse(saved) : [];
+            });
+            const [customerInfo, setCustomerInfo] = useState(() => {
+                const saved = localStorage.getItem('asfour_customer_info');
+                return saved ? JSON.parse(saved) : {
+                    name: '',
+                    phone: '',
+                    street: '',
+                    houseNumber: '',
+                    floor: '',
+                    apartment: '',
+                    landmark: '',
+                };
+            });
+
+            useEffect(() => {
+                localStorage.setItem('asfour_customer_info', JSON.stringify(customerInfo));
+            }, [customerInfo]);
+
+            useEffect(() => {
+                localStorage.setItem('asfour_past_orders', JSON.stringify(pastOrders));
+            }, [pastOrders]);
+
+            const totalPrice = useMemo(() => {
+                return cart.reduce((sum, item) => {
+                    const price = item.selectedPriceType === 'syrian' ? (item.priceSyrian || item.price) : item.price;
+                    return sum + price * item.quantity;
+                }, 0);
+            }, [cart]);
+
+            const addToCart = (item, priceType) => {
+                setCart(prev => {
+                    const existing = prev.find(i => i.id === item.id && i.selectedPriceType === priceType);
+                    if (existing) {
+                        return prev.map(i => (i.id === item.id && i.selectedPriceType === priceType) ? { ...i, quantity: i.quantity + 1 } : i);
+                    }
+                    return [...prev, { ...item, quantity: 1, selectedPriceType: priceType }];
+                });
+                
+                // Show feedback
+                setShowToast(true);
+                setTimeout(() => setShowToast(false), 2000);
+            };
+
+            const removeFromCart = (itemId, priceType) => {
+                setCart(prev => {
+                    const existing = prev.find(i => i.id === itemId && i.selectedPriceType === priceType);
+                    if (existing && existing.quantity > 1) {
+                        return prev.map(i => (i.id === itemId && i.selectedPriceType === priceType) ? { ...i, quantity: i.quantity - 1 } : i);
+                    }
+                    return prev.filter(i => !(i.id === itemId && i.selectedPriceType === priceType));
+                });
+            };
+
+            const clearItem = (itemId, priceType) => {
+                setCart(prev => prev.filter(i => !(i.id === itemId && i.selectedPriceType === priceType)));
+            };
+
+            const handleCheckout = () => {
+                if (cart.length === 0) return;
+                setCheckoutStep(2);
+                setIsCartOpen(false);
+            };
+
+            const sendToWhatsApp = () => {
+                const orderDetails = cart.map(item => {
+                    const price = item.selectedPriceType === 'syrian' ? (item.priceSyrian || item.price) : item.price;
+                    const typeStr = item.selectedPriceType 
+                        ? `(${item.selectedPriceType === 'syrian' 
+                            ? (item.category === 'وجبات' ? 'كبير' : 'سوري') 
+                            : (item.category === 'وجبات' ? 'صغير' : 'شامي')})` 
+                        : '';
+                    return `- ${item.name} ${typeStr} x${item.quantity} = ${price * item.quantity} ج.م`;
+                }).join('\n');
+
+                const message = `*طلب جديد من عصفور الشام*\n\n` +
+                    `*بيانات العميل:*\n` +
+                    `الاسم: ${customerInfo.name}\n` +
+                    `الهاتف: ${customerInfo.phone}\n` +
+                    `العنوان: ${customerInfo.street}، منزل ${customerInfo.houseNumber}، دور ${customerInfo.floor}، شقة ${customerInfo.apartment}\n` +
+                    `علامة مميزة: ${customerInfo.landmark}\n\n` +
+                    `*الطلب:*\n${orderDetails}\n\n` +
+                    `*الإجمالي:* ${totalPrice} ج.م`;
+
+                const encodedMessage = encodeURIComponent(message);
+                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
+                
+                // Save to history
+                const newOrder = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString('ar-EG'),
+                    items: [...cart],
+                    total: totalPrice
+                };
+                setPastOrders(prev => [newOrder, ...prev]);
+
+                // Reset for new order
+                setCart([]);
+                setCheckoutStep(1);
+            };
+
+            return (
+                <div className="min-h-screen bg-[#FDFCF8] text-[#2D2D2D] font-sans selection:bg-orange-100" dir="rtl">
+                    {/* Header */}
+                    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-orange-100/50 px-6 py-4 flex items-center justify-between shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <motion.div 
+                                whileHover={{ scale: 1.05 }}
+                                className="w-24 h-24 overflow-hidden flex items-center justify-center"
+                            >
+                                <img 
+                                    src="https://image2url.com/r2/default/images/1774538328773-78c9a4ba-5710-40b1-83d5-21ab9af417cb.png" 
+                                    alt="عصفور الشام" 
+                                    className="w-full h-full object-contain"
+                                    referrerPolicy="no-referrer"
+                                />
+                            </motion.div>
+                            <div>
+                                <h1 className="text-2xl font-black text-gray-900 tracking-tight leading-none">عصفور الشام</h1>
+                                <p className="text-[10px] text-orange-600 uppercase tracking-[0.2em] font-bold mt-1">Authentic Syrian Taste</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <motion.button 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setIsHistoryOpen(true)}
+                                className="p-2.5 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors border border-gray-100"
+                            >
+                                <Icon name="History" size={22} />
+                            </motion.button>
+                            <motion.a 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                href={FACEBOOK_URL} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="p-2.5 bg-[#1877F2] text-white rounded-xl hover:bg-[#166fe5] transition-colors shadow-lg shadow-blue-200"
+                            >
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                            </motion.a>
+                            <motion.button 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setIsCartOpen(true)}
+                                className="relative p-2.5 bg-orange-50 text-orange-600 rounded-xl hover:bg-orange-100 transition-colors border border-orange-100"
+                            >
+                                <Icon name="ShoppingBag" size={22} />
+                                {cart.length > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 bg-orange-600 text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center border-2 border-white font-bold shadow-sm">
+                                        {cart.reduce((a, b) => a + b.quantity, 0)}
+                                    </span>
+                                )}
+                            </motion.button>
+                        </div>
+                    </header>
+
+                    {/* Hero Section */}
+                    <section className="px-6 py-12 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100/30 rounded-full blur-3xl -mr-32 -mt-32" />
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-200/20 rounded-full blur-3xl -ml-32 -mb-32" />
+                        
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-center space-y-4 relative z-10"
+                        >
+                            <span className="px-4 py-1.5 bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-widest rounded-full">مرحباً بكم في عصفور الشام</span>
+                            <h2 className="text-4xl font-black text-gray-900 leading-tight">استمتع بأشهى المأكولات <br/><span className="text-orange-600">السورية الأصلية</span></h2>
+                            <p className="text-gray-500 text-sm max-w-xs mx-auto leading-relaxed">نقدم لكم تشكيلة مختارة من الكريبات والبرجر والوجبات السورية المحضرة بكل حب وإتقان</p>
+                        </motion.div>
+                    </section>
+
+                    {/* Categories Tabs */}
+                    <nav className="sticky top-[89px] z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 overflow-x-auto no-scrollbar flex px-6 py-5 gap-4">
+                        {CATEGORIES.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => {
+                                    setActiveCategory(cat);
+                                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                                }}
+                                className={`whitespace-nowrap px-6 py-3 rounded-2xl text-sm font-black transition-all duration-300 relative overflow-hidden flex-shrink-0 min-w-[110px] text-center ${
+                                    activeCategory === cat 
+                                        ? 'bg-orange-600 text-white shadow-xl shadow-orange-200 scale-105' 
+                                        : 'bg-white text-gray-400 hover:text-gray-600 border border-gray-100'
+                                }`}
+                            >
+                                {cat}
+                                {activeCategory === cat && (
+                                    <motion.div 
+                                        layoutId="activeTab"
+                                        className="absolute inset-0 bg-white/10 pointer-events-none"
+                                    />
+                                )}
+                            </button>
+                        ))}
+                    </nav>
+
+                    {/* Menu Items */}
+                    <main className="px-6 py-8 pb-32">
+                        <AnimatePresence mode="wait">
+                            <motion.section 
+                                key={activeCategory}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.3 }}
+                                className="space-y-8"
+                            >
+                                <div className="flex items-center gap-4 mb-8">
+                                    <h2 className="text-2xl font-black text-gray-900">{activeCategory}</h2>
+                                    <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent" />
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {MENU_DATA.filter(item => item.category === activeCategory).map((item) => (
+                                        <motion.div
+                                            key={item.id}
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            whileHover={{ y: -5 }}
+                                            className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-orange-100/50 transition-all duration-300 group relative overflow-hidden"
+                                        >
+                                            <div className="absolute top-0 left-0 w-24 h-24 bg-orange-50/50 rounded-full -ml-12 -mt-12 group-hover:scale-150 transition-transform duration-500" />
+                                            
+                                            <div className="relative z-10 flex flex-col h-full">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <h3 className="font-black text-xl text-gray-800 group-hover:text-orange-600 transition-colors">{item.name}</h3>
+                                                    <div className="text-orange-600 font-black bg-orange-50 px-4 py-1.5 rounded-2xl text-sm border border-orange-100 whitespace-nowrap">
+                                                        {item.price} ج.م
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex gap-3 mt-auto">
+                                                    {item.priceSyrian ? (
+                                                        <>
+                                                            <motion.button 
+                                                                whileTap={{ scale: 0.95 }}
+                                                                onClick={() => addToCart(item, 'shami')}
+                                                                className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-600 py-4 rounded-2xl text-xs font-black transition-all border border-gray-100 flex flex-col items-center justify-center gap-1"
+                                                            >
+                                                                <span>{item.category === 'وجبات' ? 'صغير' : 'شامي'}</span>
+                                                                <span className="opacity-60">{item.priceSyrian} ج.م</span>
+                                                            </motion.button>
+                                                            <motion.button 
+                                                                whileTap={{ scale: 0.95 }}
+                                                                onClick={() => addToCart(item, 'syrian')}
+                                                                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-2xl text-xs font-black transition-all shadow-lg shadow-orange-200 flex flex-col items-center justify-center gap-1"
+                                                            >
+                                                                <span>{item.category === 'وجبات' ? 'كبير' : 'سوري'}</span>
+                                                                <span className="opacity-80">{item.price} ج.م</span>
+                                                            </motion.button>
+                                                        </>
+                                                    ) : (
+                                                        <motion.button 
+                                                            whileTap={{ scale: 0.95 }}
+                                                            onClick={() => addToCart(item)}
+                                                            className="w-full bg-gray-900 hover:bg-black text-white py-5 rounded-2xl text-sm font-black transition-all flex items-center justify-center gap-3 shadow-lg shadow-gray-200"
+                                                        >
+                                                            <Icon name="Plus" size={18} />
+                                                            إضافة للطلب
+                                                        </motion.button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </motion.section>
+                        </AnimatePresence>
+                    </main>
+
+                    {/* Toast Notification */}
+                    <AnimatePresence>
+                        {showToast && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                                className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[100] bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10"
+                            >
+                                <div className="bg-green-500 rounded-full p-1">
+                                    <Icon name="Check" size={14} />
+                                </div>
+                                <span className="font-black text-sm">تمت الإضافة للسلة بنجاح</span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Floating Cart Button (Mobile) */}
+                    {cart.length > 0 && checkoutStep === 1 && (
+                        <motion.div 
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="fixed bottom-8 left-6 right-6 z-40"
+                        >
+                            <button 
+                                onClick={() => setIsCartOpen(true)}
+                                className="w-full bg-orange-600 text-white p-5 rounded-[2rem] shadow-2xl shadow-orange-200 flex items-center justify-between group overflow-hidden relative"
+                            >
+                                <motion.div 
+                                    className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"
+                                />
+                                <div className="flex items-center gap-4 relative z-10">
+                                    <div className="bg-white/20 p-2.5 rounded-2xl backdrop-blur-md">
+                                        <Icon name="ShoppingBag" size={24} />
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-orange-100 uppercase font-black tracking-[0.2em]">إجمالي الطلب</p>
+                                        <p className="text-xl font-black">{totalPrice} ج.م</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 font-black text-sm relative z-10 bg-white/20 px-5 py-2.5 rounded-2xl backdrop-blur-md">
+                                    عرض السلة
+                                    <Icon name="ChevronRight" size={20} className="group-hover:translate-x-[-4px] transition-transform" />
+                                </div>
+                            </button>
+                        </motion.div>
+                    )}
+
+                    {/* History Modal */}
+                    <AnimatePresence>
+                        {isHistoryOpen && (
+                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-gray-900/60 backdrop-blur-md"
+                                    onClick={() => setIsHistoryOpen(false)}
+                                />
+                                <motion.div 
+                                    initial={{ scale: 0.9, opacity: 0, y: 40 }}
+                                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                                    exit={{ scale: 0.9, opacity: 0, y: 40 }}
+                                    className="relative w-full max-w-lg bg-[#FDFCF8] rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden flex flex-col max-h-[80vh] border border-gray-100"
+                                >
+                                    <div className="p-8 bg-gray-900 text-white flex items-center justify-between">
+                                        <div>
+                                            <h3 className="text-2xl font-black tracking-tight">سجل الطلبات</h3>
+                                            <p className="text-gray-400 text-[10px] mt-1 font-bold uppercase tracking-widest">Order History</p>
+                                        </div>
+                                        <button onClick={() => setIsHistoryOpen(false)} className="p-3 hover:bg-white/10 rounded-2xl transition-all">
+                                            <Icon name="X" size={24} />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
+                                        {pastOrders.length === 0 ? (
+                                            <div className="text-center py-20 space-y-4">
+                                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-300">
+                                                    <Icon name="History" size={40} />
+                                                </div>
+                                                <p className="text-gray-400 font-bold">لا يوجد طلبات سابقة</p>
+                                            </div>
+                                        ) : (
+                                            pastOrders.map(order => (
+                                                <div key={order.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+                                                    <div className="flex justify-between items-start border-b border-gray-50 pb-4">
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest">{order.date}</p>
+                                                            <p className="text-xs text-gray-400 mt-1">رقم الطلب: #{order.id.toString().slice(-6)}</p>
+                                                        </div>
+                                                        <p className="text-lg font-black text-gray-900">{order.total} ج.م</p>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        {order.items.map((item, idx) => (
+                                                            <div key={idx} className="flex justify-between text-sm">
+                                                                <span className="text-gray-600 font-bold">
+                                                                    {item.name} 
+                                                                    <span className="text-[10px] text-gray-400 mr-2">
+                                                                        ({item.selectedPriceType === 'syrian' ? (item.category === 'وجبات' ? 'كبير' : 'سوري') : (item.category === 'وجبات' ? 'صغير' : 'شامي')})
+                                                                    </span>
+                                                                </span>
+                                                                <span className="text-gray-400">x{item.quantity}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <button 
+                                                        onClick={() => {
+                                                            order.items.forEach(item => addToCart(item, item.selectedPriceType));
+                                                            setIsHistoryOpen(false);
+                                                        }}
+                                                        className="w-full py-3 bg-orange-50 text-orange-600 rounded-2xl text-xs font-black hover:bg-orange-100 transition-all flex items-center justify-center gap-2"
+                                                    >
+                                                        <Icon name="RefreshCw" size={14} />
+                                                        إعادة الطلب
+                                                    </button>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                    
+                                    {pastOrders.length > 0 && (
+                                        <div className="p-6 bg-white border-t border-gray-100">
+                                            <button 
+                                                onClick={() => {
+                                                    if(confirm('هل أنت متأكد من مسح سجل الطلبات؟')) {
+                                                        setPastOrders([]);
+                                                    }
+                                                }}
+                                                className="w-full py-4 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 rounded-2xl transition-all"
+                                            >
+                                                مسح السجل بالكامل
+                                            </button>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            </div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Cart Drawer */}
+                    <AnimatePresence>
+                        {isCartOpen && (
+                            <>
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    onClick={() => setIsCartOpen(false)}
+                                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+                                />
+                                <motion.div 
+                                    initial={{ x: '100%' }}
+                                    animate={{ x: 0 }}
+                                    exit={{ x: '100%' }}
+                                    className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col"
+                                >
+                                    <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-md">
+                                        <div>
+                                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">سلة الطلبات</h2>
+                                            <p className="text-[10px] text-orange-600 font-bold uppercase tracking-widest mt-1">Your Selected Items</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => setIsCartOpen(false)} 
+                                            className="p-3 hover:bg-gray-100 rounded-2xl transition-all active:scale-95 text-gray-400"
+                                        >
+                                            <Icon name="X" size={24} />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar">
+                                        {cart.length === 0 ? (
+                                            <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
+                                                <div className="w-24 h-24 bg-orange-50 rounded-[2.5rem] flex items-center justify-center text-orange-200 rotate-12">
+                                                    <Icon name="ShoppingBag" size={48} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-gray-900 font-black text-xl">السلة فارغة</p>
+                                                    <p className="text-gray-400 text-sm mt-2">ابدأ بإضافة بعض الأصناف اللذيذة</p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            cart.map((item) => (
+                                                <motion.div 
+                                                    layout
+                                                    initial={{ opacity: 0, x: 20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    key={`${item.id}-${item.selectedPriceType}`} 
+                                                    className="flex items-center justify-between gap-6 group"
+                                                >
+                                                    <div className="flex-1">
+                                                        <h4 className="font-black text-gray-800 group-hover:text-orange-600 transition-colors">{item.name}</h4>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <span className="px-2 py-0.5 bg-orange-50 text-orange-600 text-[10px] font-black rounded-md uppercase tracking-wider">
+                                                                {item.selectedPriceType === 'syrian' 
+                                                                    ? (item.category === 'وجبات' ? 'كبير' : 'سوري') 
+                                                                    : item.selectedPriceType === 'shami' 
+                                                                        ? (item.category === 'وجبات' ? 'صغير' : 'شامي') 
+                                                                        : 'عادي'}
+                                                            </span>
+                                                            <span className="text-gray-400 text-xs font-bold">
+                                                                {item.selectedPriceType === 'syrian' ? (item.priceSyrian || item.price) : item.price} ج.م
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex items-center gap-4 bg-gray-50 p-1.5 rounded-2xl border border-gray-100 shadow-inner">
+                                                            <motion.button 
+                                                                whileTap={{ scale: 0.8 }}
+                                                                onClick={() => removeFromCart(item.id, item.selectedPriceType)}
+                                                                className="w-10 h-10 flex items-center justify-center bg-white text-gray-400 hover:text-orange-600 rounded-xl shadow-sm transition-colors"
+                                                            >
+                                                                <Icon name="Minus" size={16} />
+                                                            </motion.button>
+                                                            <span className="font-black w-6 text-center text-gray-800">{item.quantity}</span>
+                                                            <motion.button 
+                                                                whileTap={{ scale: 0.8 }}
+                                                                onClick={() => addToCart(item, item.selectedPriceType)}
+                                                                className="w-10 h-10 flex items-center justify-center bg-white text-gray-400 hover:text-orange-600 rounded-xl shadow-sm transition-colors"
+                                                            >
+                                                                <Icon name="Plus" size={16} />
+                                                            </motion.button>
+                                                        </div>
+                                                        <motion.button
+                                                            whileTap={{ scale: 0.8 }}
+                                                            onClick={() => clearItem(item.id, item.selectedPriceType)}
+                                                            className="p-3 text-gray-300 hover:text-red-500 transition-colors"
+                                                            title="حذف العنصر"
+                                                        >
+                                                            <Icon name="Trash2" size={20} />
+                                                        </motion.button>
+                                                    </div>
+                                                </motion.div>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    {cart.length > 0 && (
+                                        <div className="p-8 border-t border-gray-100 bg-white space-y-6">
+                                            <div className="flex justify-between items-end">
+                                                <div>
+                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">المبلغ الإجمالي</p>
+                                                    <h3 className="text-3xl font-black text-gray-900">{totalPrice} <span className="text-sm font-bold text-orange-600">ج.م</span></h3>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">عدد الأصناف</p>
+                                                    <p className="text-lg font-black text-gray-900">{cart.reduce((a, b) => a + b.quantity, 0)}</p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={handleCheckout}
+                                                className="w-full bg-gray-900 hover:bg-black text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl shadow-gray-200 flex items-center justify-center gap-4 transition-all active:scale-95 group"
+                                            >
+                                                استكمال الطلب
+                                                <Icon name="ArrowRight" size={22} className="group-hover:translate-x-[-4px] transition-transform" />
+                                            </button>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Checkout Form Modal */}
+                    <AnimatePresence>
+                        {checkoutStep === 2 && (
+                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-gray-900/60 backdrop-blur-md"
+                                    onClick={() => setCheckoutStep(1)}
+                                />
+                                <motion.div 
+                                    initial={{ scale: 0.9, opacity: 0, y: 40 }}
+                                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                                    exit={{ scale: 0.9, opacity: 0, y: 40 }}
+                                    className="relative w-full max-w-lg bg-white rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden flex flex-col max-h-[90vh] border border-gray-100"
+                                >
+                                    <div className="p-8 bg-gray-900 text-white flex items-center justify-between relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-600/20 rounded-full blur-2xl -mr-16 -mt-16" />
+                                        <div className="relative z-10">
+                                            <h3 className="text-2xl font-black tracking-tight">بيانات التوصيل</h3>
+                                            <p className="text-gray-400 text-[10px] mt-1 font-bold uppercase tracking-widest">يتم حفظ بياناتك تلقائياً لسهولة الطلب لاحقاً</p>
+                                        </div>
+                                        <button onClick={() => setCheckoutStep(1)} className="p-3 hover:bg-white/10 rounded-2xl transition-all active:scale-95 relative z-10">
+                                            <Icon name="X" size={24} />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar">
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] px-1">الاسم بالكامل</label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="أدخل اسمك الثلاثي"
+                                                className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-orange-500 transition-all outline-none font-bold text-gray-800 placeholder:text-gray-300 shadow-inner"
+                                                value={customerInfo.name}
+                                                onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})}
+                                            />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] px-1">رقم الهاتف</label>
+                                            <input 
+                                                type="tel" 
+                                                placeholder="01xxxxxxxxx"
+                                                className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-orange-500 transition-all outline-none font-bold text-gray-800 placeholder:text-gray-300 shadow-inner"
+                                                value={customerInfo.phone}
+                                                onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                                            />
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] px-1">اسم الشارع</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-orange-500 transition-all outline-none font-bold text-gray-800 shadow-inner"
+                                                    value={customerInfo.street}
+                                                    onChange={e => setCustomerInfo({...customerInfo, street: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] px-1">رقم المنزل</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-orange-500 transition-all outline-none font-bold text-gray-800 shadow-inner"
+                                                    value={customerInfo.houseNumber}
+                                                    onChange={e => setCustomerInfo({...customerInfo, houseNumber: e.target.value})}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] px-1">الطابق</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-orange-500 transition-all outline-none font-bold text-gray-800 shadow-inner"
+                                                    value={customerInfo.floor}
+                                                    onChange={e => setCustomerInfo({...customerInfo, floor: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] px-1">الشقة</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-orange-500 transition-all outline-none font-bold text-gray-800 shadow-inner"
+                                                    value={customerInfo.apartment}
+                                                    onChange={e => setCustomerInfo({...customerInfo, apartment: e.target.value})}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] px-1">علامة مميزة</label>
+                                            <textarea 
+                                                placeholder="مثال: بجوار صيدلية..."
+                                                className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-orange-500 transition-all outline-none font-bold text-gray-800 placeholder:text-gray-300 shadow-inner resize-none h-28"
+                                                value={customerInfo.landmark}
+                                                onChange={e => setCustomerInfo({...customerInfo, landmark: e.target.value})}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="p-8 bg-white border-t border-gray-100">
+                                        <button 
+                                            disabled={!customerInfo.name || !customerInfo.phone || !customerInfo.street}
+                                            onClick={sendToWhatsApp}
+                                            className="w-full bg-green-600 disabled:bg-gray-200 text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl shadow-green-100 flex items-center justify-center gap-4 transition-all active:scale-95 group"
+                                        >
+                                            إرسال عبر واتساب
+                                            <Icon name="CheckCircle2" size={24} className="group-hover:scale-110 transition-transform" />
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            </div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Footer Info */}
+                    <footer className="bg-gray-900 text-white px-8 py-20 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-600 to-transparent opacity-50" />
+                        
+                        <div className="relative z-10 max-w-4xl mx-auto space-y-12">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-20 h-20 bg-orange-600 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-orange-900/50 rotate-3">
+                                    <Icon name="UtensilsCrossed" className="text-white w-10 h-10" />
+                                </div>
+                                <div className="text-center">
+                                    <h3 className="text-3xl font-black tracking-tight">عصفور الشام</h3>
+                                    <p className="text-orange-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Premium Syrian Cuisine</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <motion.a 
+                                    whileHover={{ y: -5 }}
+                                    href="tel:01122292215"
+                                    className="bg-white/5 backdrop-blur-md p-8 rounded-[2.5rem] border border-white/10 flex flex-col items-center text-center space-y-4 w-full"
+                                >
+                                    <div className="w-14 h-14 bg-orange-600/20 text-orange-500 rounded-2xl flex items-center justify-center">
+                                        <Icon name="Phone" size={24} />
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">خدمة العملاء</span>
+                                        <p className="text-xl font-black mt-1">01122292215</p>
+                                    </div>
+                                </motion.a>
+
+                                <motion.div 
+                                    whileHover={{ y: -5 }}
+                                    className="bg-white/5 backdrop-blur-md p-8 rounded-[2.5rem] border border-white/10 flex flex-col items-center text-center space-y-4"
+                                >
+                                    <div className="w-14 h-14 bg-orange-600/20 text-orange-500 rounded-2xl flex items-center justify-center">
+                                        <Icon name="MapPin" size={24} />
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">العنوان</span>
+                                        <p className="text-xl font-black mt-1">79 ش مصر والسوان</p>
+                                    </div>
+                                </motion.div>
+                            </div>
+
+                            <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">© 2026 عصفور الشام - جميع الحقوق محفوظة</p>
+                                <div className="flex items-center gap-4">
+                                    <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-[#1877F2] hover:bg-[#166fe5] rounded-xl flex items-center justify-center transition-all shadow-lg shadow-blue-900/20">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+                                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
